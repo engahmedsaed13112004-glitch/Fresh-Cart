@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { FaStar, FaPlus, FaHeart } from 'react-icons/fa6';
 import { FiEye, FiRepeat } from 'react-icons/fi';
 import { useWishlist } from '../../../../context/WishlistContext';
@@ -24,12 +25,13 @@ export default function SingleProduct({ product }: { product: any }) {
     return `https://ecommerce.routemisr.com${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
-  const handleWishlistToggle = async () => {
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsBtnLoading(true);
     if (isInWishlist) {
       await removeFromWishlist(productId);
     } else {
-     
       await addToWishlist(product);
     }
     setIsBtnLoading(false);
@@ -38,20 +40,20 @@ export default function SingleProduct({ product }: { product: any }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 relative group flex flex-col justify-between hover:shadow-md transition-shadow h-full">
       <div>
-       
         <div className="relative w-full h-48 mb-3 flex justify-center items-center overflow-hidden">
-          <img
-            src={getImageUrl(product?.imageCover || product?.image)}
-            className="h-full w-full object-contain p-2"
-            alt={product?.title || 'product'}
-            referrerPolicy="no-referrer"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = FALLBACK_IMAGE_URL;
-            }}
-          />
+          <Link href={`/products/${productId}`} className="w-full h-full flex justify-center items-center">
+            <img
+              src={getImageUrl(product?.imageCover || product?.image)}
+              className="h-full w-full object-contain p-2 cursor-pointer"
+              alt={product?.title || 'product'}
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = FALLBACK_IMAGE_URL;
+              }}
+            />
+          </Link>
 
-          
           <div className="absolute top-1 right-1 flex flex-col gap-1.5 text-gray-500 z-10">
             <button
               type="button"
@@ -68,16 +70,18 @@ export default function SingleProduct({ product }: { product: any }) {
             </button>
             <button
               type="button"
+              onClick={(e) => e.stopPropagation()}
               className="w-7 h-7 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-colors shadow-sm cursor-pointer"
             >
               <FiRepeat className="text-xs" />
             </button>
-            <button
-              type="button"
+            <Link
+              href={`/products/${productId}`}
+              onClick={(e) => e.stopPropagation()}
               className="w-7 h-7 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-colors shadow-sm cursor-pointer"
             >
               <FiEye className="text-xs" />
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -85,10 +89,11 @@ export default function SingleProduct({ product }: { product: any }) {
           {product?.category?.name || "Women's Fashion"}
         </span>
 
-        
-        <h3 className="text-sm font-semibold text-gray-800 line-clamp-1 mb-1">
-          {product?.title}
-        </h3>
+        <Link href={`/products/${productId}`}>
+          <h3 className="text-sm font-semibold text-gray-800 line-clamp-1 mb-1 hover:text-emerald-600 transition-colors cursor-pointer">
+            {product?.title}
+          </h3>
+        </Link>
 
         <div className="flex items-center gap-1 mb-3">
           <div className="flex text-yellow-400 text-xs">
@@ -125,7 +130,9 @@ export default function SingleProduct({ product }: { product: any }) {
           )}
         </div>
 
-        <MyAddToCart id={product?._id || product?.id} />
+        <div onClick={(e) => e.stopPropagation()}>
+          <MyAddToCart id={product?._id || product?.id} />
+        </div>
       </div>
     </div>
   );

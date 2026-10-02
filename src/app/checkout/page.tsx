@@ -63,9 +63,12 @@ export default function CheckoutPage() {
           toast.error(res?.message || "An error occurred while placing the order");
         }
       } else {
+        // تحديد رابط الموقع للتحويل عليه بعد انتهاء الدفع
         const domain = window.location.origin;
         const res = await createOnlineOrder(cartId, shippingAddress, domain);
+        
         if (res?.status === "success" && res?.session?.url) {
+          // التحويل المباشر لصفحة Stripe الخارجية الموجودة بالصورة
           window.location.href = res.session.url; 
         } else {
           toast.error(res?.message || "Failed to open the payment gateway");
@@ -87,9 +90,7 @@ export default function CheckoutPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto">
           <div>
-            <label className="block text-gray-800 font-medium mb-2">
-              Details
-            </label>
+            <label className="block text-gray-800 font-medium mb-2">Details</label>
             <input
               type="text"
               value={details}
@@ -100,9 +101,7 @@ export default function CheckoutPage() {
           </div>
 
           <div>
-            <label className="block text-red-600 font-medium mb-2">
-              Phone :
-            </label>
+            <label className="block text-red-600 font-medium mb-2">Phone :</label>
             <input
               type="text"
               value={phone}
@@ -122,9 +121,7 @@ export default function CheckoutPage() {
           </div>
 
           <div>
-            <label className="block text-red-600 font-medium mb-2">
-              City
-            </label>
+            <label className="block text-red-600 font-medium mb-2">City</label>
             <input
               type="text"
               value={city}
@@ -144,9 +141,7 @@ export default function CheckoutPage() {
           </div>
 
           <div className="pt-2">
-            <label className="block text-gray-800 font-medium mb-2">
-              Payment Method
-            </label>
+            <label className="block text-gray-800 font-medium mb-2">Payment Method</label>
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input

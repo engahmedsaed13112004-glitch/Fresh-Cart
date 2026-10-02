@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 import { registerSchema } from '../../Schema/register.schema';
 
 export default function Register() {
-  const Router = useRouter()
+  const router = useRouter();
 
   const { handleSubmit, control } = useForm({
     defaultValues: {
@@ -28,43 +28,48 @@ export default function Register() {
     },
     resolver: zodResolver(registerSchema),
     mode: "onChange"
-  })
+  });
 
-  async function handleRegister(values: FieldValues) { 
-    fetch("https://ecommerce.routemisr.com/api/v1/auth/signup", {
-      method: "POST",
-      body: JSON.stringify(values),
-      headers: { "Content-Type": "application/json" }
-    })
-    .then((res) => {
-      console.log(res);
-     
-    if (!res?.ok) {
-      Toaster.add({
-        title: "account is created successfly",
-        type: "Success" 
+  async function handleRegister(values: FieldValues) {
+    try {
+      const res = await fetch("https://ecommerce.routemisr.com/api/v1/auth/signup", {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" }
       });
-    } else {
+
+      const data = await res.json();
+
+      if (res.ok) {
+        Toaster.add({
+          title: "Account created successfully",
+          type: "Success"
+        });
+        
+        // التحويل لصفحة تسجيل الدخول بعد النجاح
+        setTimeout(() => {
+          router.push("/login"); 
+        }, 1500);
+
+      } else {
+        Toaster.add({
+          title: data.message || "An error occurred during registration",
+          type: "Error"
+        });
+      }
+    } catch (error) {
       Toaster.add({
-        title: "Logged in successfully",
-        type: "sucsess"
+        title: "Network error, please try again later",
+        type: "Error"
       });
-      Router.push("/");
     }
   }
 
-
-
-
-
-      )}
-
- 
   return (
     <>
-      <h1 className="text-3xl text-green-800 text-center my-2"> Register Now! </h1>
+      <h1 className="text-3xl text-green-800 text-center my-4 font-bold"> Register Now! </h1>
       
-      <form onSubmit={handleSubmit(handleRegister)} className='w-3/4 mx-auto'>
+      <form onSubmit={handleSubmit(handleRegister)} className='w-3/4 mx-auto space-y-4'>
         <Controller
           name="name"
           control={control}
@@ -150,7 +155,7 @@ export default function Register() {
           )}
         />
 
-        <Button type='submit' className="bg-green-600 text-white">Submit</Button>
+        <Button type='submit' className="bg-green-600 text-white w-full py-2 mt-4 hover:bg-green-700">Submit</Button>
       </form>
     </>
   )
